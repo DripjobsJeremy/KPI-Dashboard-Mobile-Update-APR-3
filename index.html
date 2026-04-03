@@ -144,14 +144,13 @@ body {
   height: 720px;
   /* NO overflow-y here — inner .phone-inner scrolls instead */
 }
-/* Inner scroll layer keeps drawer/backdrop anchored to the 720px viewport */
+/* Inner scroll layer keeps drawer/backdrop anchored to the 720px viewport.
+   Block (not flex) so position:sticky works correctly on nav/datebar. */
 .phone-inner {
   height: 100%;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  display: flex;
-  flex-direction: column;
 }
 .phone-inner::-webkit-scrollbar { display: none; }
 /* Status bar — real element so it's sticky within the inner scroll context */
@@ -249,6 +248,7 @@ body {
   cursor: pointer;
   text-align: center;
   white-space: nowrap;
+  -webkit-user-select: none;
   user-select: none;
   transition: all 0.15s;
 }
@@ -371,6 +371,7 @@ body {
   cursor: pointer;
   transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
   -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
   user-select: none;
 }
 .kpi-card:active {
@@ -487,9 +488,6 @@ body {
 .sc-total-lbl { grid-column: 1 / 3; font-size: 12px; font-weight: 700; color: var(--text-primary); }
 .sc-total-val { font-size: 11.5px; font-weight: 700; color: var(--text-primary); text-align: right; white-space: nowrap; }
 
-.sc-footer { display: flex; justify-content: flex-end; gap: 6px; margin-top: 10px; }
-.sc-btn-csv { display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; border: 1px solid #ABEFC6; border-radius: 5px; background: #F6FEF9; color: #067647; font-family: 'DM Sans',sans-serif; font-size: 10.5px; font-weight: 600; cursor: pointer; }
-.sc-btn-pdf { display: inline-flex; align-items: center; gap: 4px; padding: 4px 9px; border: 1px solid #FECDCA; border-radius: 5px; background: #FFF5F5; color: #B42318; font-family: 'DM Sans',sans-serif; font-size: 10.5px; font-weight: 600; cursor: pointer; }
 
 /* ─── DRAWER ─────────────────────────────────────── */
 .drawer-backdrop {
@@ -856,7 +854,6 @@ body {
                 <div class="sc-total-val">6</div>
                 <div></div>
               </div>
-              <div class="sc-footer"><div class="sc-btn-csv">📋 CSV</div><div class="sc-btn-pdf">📄 PDF</div></div>
             </div>
             <!-- Sales By Source -->
             <div class="m-sc">
@@ -911,7 +908,6 @@ body {
                 <div class="sc-total-val">$28,518</div>
                 <div></div>
               </div>
-              <div class="sc-footer"><div class="sc-btn-csv">📋 CSV</div><div class="sc-btn-pdf">📄 PDF</div></div>
             </div>
           </div>
         </div>
@@ -1242,7 +1238,6 @@ function buildSectionCard(s) {
     rows +
     '<div class="sc-total-line"></div>' +
     '<div class="sc-total-row"><div class="sc-total-lbl">' + tlabel + '</div><div></div><div class="sc-total-val">' + s.totalVal + '</div><div></div></div>' +
-    '<div class="sc-footer"><div class="sc-btn-csv">📋 CSV</div><div class="sc-btn-pdf">📄 PDF</div></div>' +
   '</div>';
 }
 

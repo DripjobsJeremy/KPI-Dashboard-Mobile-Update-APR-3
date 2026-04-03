@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mobile KPI Grid — DripJobs Prototype</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+/* ─── TOKENS ─────────────────────────────────────── */
+:root {
+  --bg:            #F0F2F5;
+  --surface:       #FFFFFF;
+  --border:        #E4E7EC;
+  --border-strong: #D0D5DD;
+  --text-primary:  #101828;
+  --text-secondary:#475467;
+  --text-muted:    #98A2B3;
+  --purple:        #6941C6;
+  --purple-light:  #F4F3FF;
+  --purple-ring:   rgba(105,65,198,0.14);
+  --shadow-tile:   0 1px 3px rgba(16,24,40,0.08), 0 1px 2px rgba(16,24,40,0.04);
+  --shadow-drawer: -16px 0 40px rgba(16,24,40,0.14);
+  --radius:        14px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #1E1B2E;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px 64px;
+  gap: 0;
+}
+
+/* ─── PROTOTYPE CHROME ───────────────────────────── */
+.proto-header {
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+.proto-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+}
+.proto-badge {
+  background: #7C3AED;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+.proto-desc {
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+  max-width: 560px;
+  line-height: 1.55;
+}
+
+/* ─── TOGGLE ─────────────────────────────────────── */
+.toggle-bar {
+  display: flex;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 30px;
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 28px;
+}
+.toggle-btn {
+  padding: 8px 20px;
+  border-radius: 24px;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.45);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+}
+.toggle-btn.active {
+  background: #7C3AED;
+  color: white;
+  box-shadow: 0 2px 8px rgba(124,58,237,0.4);
+}
+
+/* ─── TWO-PHONE LAYOUT ───────────────────────────── */
+.phones-row {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+  justify-content: center;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 900px;
+}
+.phone-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.phone-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+}
+.phone-label.new-label { color: #A78BFA; }
+
+/* ─── PHONE SHELL ────────────────────────────────── */
+.phone {
+  width: 375px;
+  background: #1A1A2E;
+  border-radius: 44px;
+  padding: 12px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.07),
+    0 32px 80px rgba(0,0,0,0.55),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+  position: relative;
+}
+.phone-screen {
+  width: 100%;
+  border-radius: 34px;
+  background: var(--bg);
+  overflow: hidden;
+  position: relative;
+  /* fixed height = scrollable phone screen */
+  height: 720px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.phone-screen::-webkit-scrollbar { display: none; }
+/* Status bar */
+.phone-screen::before {
+  content: '9:41';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  letter-spacing: 0.04em;
+}
+
+/* ─── APP NAV (mobile) ───────────────────────────── */
+.m-nav {
+  height: 48px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  position: sticky;
+  top: 40px;
+  z-index: 50;
+}
+.m-nav-logo {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--purple);
+  letter-spacing: -0.3px;
+}
+.m-nav-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--purple);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── DATE SUB-BAR ───────────────────────────────── */
+.m-datebar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  position: sticky;
+  top: 88px;
+  z-index: 40;
+}
+.m-date-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.m-period-tabs {
+  display: flex;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 3px;
+  gap: 2px;
+  width: 100%;
+  justify-content: center;
+}
+.m-period-tab {
+  flex: 1;
+  padding: 6px 4px;
+  border-radius: 16px;
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
+  user-select: none;
+  transition: all 0.15s;
+}
+.m-period-tab.active {
+  background: var(--surface);
+  color: var(--text-primary);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+/* ─── SCREEN CONTENT ─────────────────────────────── */
+.m-main { padding: 14px 12px 24px; }
+.m-overview-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.m-overview-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ════════════════════════════════════════
+   CURRENT (problematic) MOBILE LAYOUT
+   Single-column grouped cards
+════════════════════════════════════════ */
+.current-banner { display: flex; flex-direction: column; gap: 10px; }
+.cur-group {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  box-shadow: var(--shadow-tile);
+}
+.cur-group-label {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+.cur-kpi-list { display: flex; flex-direction: column; gap: 8px; }
+.cur-kpi-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #FCFCFD;
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  transition: border-color 0.15s;
+}
+.cur-kpi-card:active { border-color: var(--purple); }
+.cur-kpi-left { display: flex; flex-direction: column; gap: 3px; flex: 1; }
+.cur-kpi-top { display: flex; align-items: center; gap: 7px; }
+.cur-kpi-icon {
+  width: 26px; height: 26px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; flex-shrink: 0;
+}
+.cur-kpi-name {
+  font-size: 11px; font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--purple);
+}
+.cur-kpi-def { font-size: 9.5px; color: var(--text-secondary); line-height: 1.3; }
+.cur-kpi-afford {
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border: 1px solid #D6BBFB;
+  border-radius: 999px;
+  font-size: 9.5px;
+  color: var(--purple);
+  font-weight: 700;
+  background: #F4F3FF;
+}
+.cur-kpi-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--purple);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ════════════════════════════════════════
+   NEW (proposed) MOBILE LAYOUT
+   2-column clean card grid
+════════════════════════════════════════ */
+.new-banner { display: flex; flex-direction: column; gap: 0; }
+.kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 0;
+}
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 12px 16px;
+  box-shadow: var(--shadow-tile);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.kpi-card:active {
+  transform: scale(0.97);
+  border-color: var(--purple);
+  box-shadow: 0 0 0 2px var(--purple-ring);
+}
+.kpi-card.full-width { grid-column: 1 / -1; }
+.kpi-card-icon {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+.icon-sales     { background: #ECFDF3; }
+.icon-proposals { background: #EFF8FF; }
+.icon-jobs      { background: #FFFAEB; }
+.icon-avg       { background: #F4F3FF; }
+.icon-appts     { background: #FFF1F3; }
+.icon-setrate   { background: #F0FDF9; }
+.icon-closing   {
+  background: #EFF8FF;
+  color: #1570EF;
+  font-size: 13px;
+  font-weight: 800;
+  font-family: 'DM Sans', sans-serif;
+}
+.kpi-card-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  line-height: 1.2;
+}
+.kpi-card-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--purple);
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+/* smaller value for long numbers */
+.kpi-card-value.sm { font-size: 17px; letter-spacing: -0.3px; }
+
+/* ─── SECTION CARDS (below banner) ──────────────── */
+.m-sections { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+.m-sc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow-tile);
+}
+.m-sc-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.m-sc-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: #ECFDF3;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+.m-sc-title { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.m-sc-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+.m-sc-body { height: 80px; background: var(--bg); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.m-sc-body-text { font-size: 11px; color: var(--text-muted); }
+
+/* ─── DRAWER ─────────────────────────────────────── */
+.drawer-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(16,24,40,0.28);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 80;
+  border-radius: 34px;
+}
+.drawer-backdrop.show { opacity: 1; pointer-events: auto; }
+.kpi-drawer {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  background: var(--surface);
+  border-radius: 20px 20px 0 0;
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -8px 32px rgba(16,24,40,0.14);
+  transform: translateY(100%);
+  transition: transform 0.26s cubic-bezier(0.32,0,0.67,0);
+  z-index: 90;
+  max-height: 75%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.kpi-drawer.show {
+  transform: translateY(0);
+  transition: transform 0.26s cubic-bezier(0.33,1,0.68,1);
+}
+.drawer-handle {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 10px auto 0;
+  flex-shrink: 0;
+}
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.drawer-head-left { display: flex; align-items: center; gap: 10px; }
+.drawer-icon {
+  width: 34px; height: 34px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+.drawer-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--purple);
+}
+.drawer-subtitle {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+.drawer-body {
+  padding: 14px 16px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+.drawer-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.drawer-big-value {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -1px;
+  line-height: 1;
+}
+.drawer-period-badge {
+  background: var(--purple-light);
+  color: var(--purple);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+.drawer-bd-label {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.drawer-bd-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--bg);
+}
+.drawer-bd-left { display: flex; align-items: center; gap: 8px; }
+.drawer-bd-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.drawer-bd-name { font-size: 12.5px; font-weight: 500; color: var(--text-secondary); }
+.drawer-bd-val { font-size: 13px; font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.drawer-close-btn {
+  width: 100%;
+  border: 1px solid #C7D7FE;
+  background: #EEF4FF;
+  color: #1D4ED8;
+  border-radius: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 13px 14px;
+  cursor: pointer;
+  margin-top: 14px;
+  display: block;
+}
+.drawer-close-btn:active { background: #E0EAFF; }
+
+/* ─── ANNOTATION CHIPS (new layout) ─────────────── */
+.annot-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+  margin-bottom: 4px;
+  max-width: 375px;
+}
+.annot-chip {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 10px;
+  padding: 8px 10px;
+  max-width: 375px;
+  width: 100%;
+}
+.annot-num {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: #7C3AED;
+  color: white;
+  font-size: 9px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.annot-text {
+  font-size: 11.5px;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.5;
+}
+.annot-text strong { color: rgba(255,255,255,0.85); font-weight: 600; }
+
+/* ─── COMPARISON NOTE ────────────────────────────── */
+.compare-note {
+  text-align: center;
+  font-size: 11.5px;
+  color: rgba(255,255,255,0.35);
+  margin-top: 24px;
+  line-height: 1.6;
+  max-width: 600px;
+}
+</style>
+</head>
+<body>
+
+<!-- PROTOTYPE HEADER -->
+<div class="proto-header">
+  <div class="proto-title">DripJobs Prototype</div>
+  <div class="proto-badge">Mobile KPI Grid — Ticket 86b8qu3hn-mobile</div>
+  <p class="proto-desc">Mobile metrics view redesign. 2-column card grid replaces grouped desktop layout at ≤768px. Tap any card to see the preserved drawer interaction.</p>
+</div>
+
+<!-- TOGGLE -->
+<div class="toggle-bar">
+  <button class="toggle-btn" id="btnBefore" onclick="showView('before')">Before (Current)</button>
+  <button class="toggle-btn active" id="btnAfter" onclick="showView('after')">After (Proposed)</button>
+  <button class="toggle-btn" id="btnBoth" onclick="showView('both')">Side by Side</button>
+</div>
+
+<!-- PHONES ROW -->
+<div class="phones-row" id="phonesRow">
+
+  <!-- ─── BEFORE: CURRENT PROBLEMATIC LAYOUT ─── -->
+  <div class="phone-wrap" id="wrapBefore" style="display:none">
+    <div class="phone-label">Current — Grouped, Cluttered</div>
+    <div class="phone">
+      <div class="phone-screen">
+        <!-- Nav -->
+        <div class="m-nav">
+          <span class="m-nav-logo">dripjobs</span>
+          <div class="m-nav-avatar">JH</div>
+        </div>
+        <!-- Date bar -->
+        <div class="m-datebar">
+          <div class="m-date-pill">📅 03/04/2026 – 04/03/2026</div>
+          <div class="m-period-tabs">
+            <div class="m-period-tab">Today</div>
+            <div class="m-period-tab">Week</div>
+            <div class="m-period-tab">Last Wk</div>
+            <div class="m-period-tab active">Month</div>
+            <div class="m-period-tab">Last Mo</div>
+            <div class="m-period-tab">YTD</div>
+            <div class="m-period-tab">All</div>
+          </div>
+        </div>
+        <!-- Main -->
+        <div class="m-main">
+          <div class="m-overview-label">Overview</div>
+          <!-- CURRENT grouped layout -->
+          <div class="current-banner">
+            <!-- Group 1 -->
+            <div class="cur-group">
+              <div class="cur-group-label">Revenue &amp; Wins</div>
+              <div class="cur-kpi-list">
+                <div class="cur-kpi-card">
+                  <div class="cur-kpi-left">
+                    <div class="cur-kpi-top">
+                      <div class="cur-kpi-icon" style="background:#ECFDF3">💰</div>
+                      <span class="cur-kpi-name">Sales</span>
+                    </div>
+                    <div class="cur-kpi-def">Pipeline + Manual Invoice Revenue.</div>
+                    <span class="cur-kpi-afford">View details →</span>
+                  </div>
+                  <div class="cur-kpi-value">$142,977</div>
+                </div>
+                <div class="cur-kpi-card">
+                  <div class="cur-kpi-left">
+                    <div class="cur-kpi-top">
+                      <div class="cur-kpi-icon" style="background:#FFFAEB">🏆</div>
+                      <span class="cur-kpi-name">Jobs Won</span>
+                    </div>
+                    <div class="cur-kpi-def">Accepted Proposals + Manual Invoices.</div>
+                    <span class="cur-kpi-afford">View details →</span>
+                  </div>
+                  <div class="cur-kpi-value">25</div>
+                </div>
+                <div class="cur-kpi-card">
+                  <div class="cur-kpi-left">
+                    <div class="cur-kpi-top">
+                      <div class="cur-kpi-icon" style="background:#F4F3FF">📊</div>
+                      <span class="cur-kpi-name">Avg Job Size</span>
+                    </div>
+                    <div class="cur-kpi-def">Total Sales Per Job Won.</div>
+                    <span class="cur-kpi-afford">View details →</span>
+                  </div>
+                  <div class="cur-kpi-value">$5,719</div>
+                </div>
+              </div>
+            </div>
+            <!-- Group 2 -->
+            <div class="cur-group">
+              <div class="cur-group-label">Conversions &amp; Volume</div>
+              <div class="cur-kpi-list">
+                <div class="cur-kpi-card">
+                  <div class="cur-kpi-left">
+                    <div class="cur-kpi-top">
+                      <div class="cur-kpi-icon" style="background:#EFF8FF;color:#1570EF;font-weight:800;font-size:11px">%</div>
+                      <span class="cur-kpi-name">Closing Ratio</span>
+                    </div>
+                    <div class="cur-kpi-def">Accepted Proposals / Qualified Proposals.</div>
+                    <span class="cur-kpi-afford">View details →</span>
+                  </div>
+                  <div class="cur-kpi-value">23.2%</div>
+                </div>
+                <div class="cur-kpi-card">
+                  <div class="cur-kpi-left">
+                    <div class="cur-kpi-top">
+                      <div class="cur-kpi-icon" style="background:#F0FDF9">🎯</div>
+                      <span class="cur-kpi-name">Set Rate</span>
+                    </div>
+                    <div class="cur-kpi-def">Contacts Created To Booked Rate.</div>
+                    <span class="cur-kpi-afford">View details →</span>
+                  </div>
+                  <div class="cur-kpi-value">36.17%</div>
+                </div>
+                <div class="cur-kpi-card">
+                  <div class="cur-kpi-left">
+                    <div class="cur-kpi-top">
+                      <div class="cur-kpi-icon" style="background:#FFF1F3">📅</div>
+                      <span class="cur-kpi-name">Appointments</span>
+                    </div>
+                    <div class="cur-kpi-def">Total appointments booked in period.</div>
+                    <span class="cur-kpi-afford">View details →</span>
+                  </div>
+                  <div class="cur-kpi-value">78</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Stacked section cards -->
+          <div class="m-sections">
+            <div class="m-sc">
+              <div class="m-sc-head">
+                <div class="m-sc-icon">💰</div>
+                <div><div class="m-sc-title">Revenue by Lead Source</div><div class="m-sc-desc">Pipeline revenue breakdown</div></div>
+              </div>
+              <div class="m-sc-body"><span class="m-sc-body-text">Chart data</span></div>
+            </div>
+            <div class="m-sc">
+              <div class="m-sc-head">
+                <div class="m-sc-icon" style="background:#FFF1F3">📋</div>
+                <div><div class="m-sc-title">Proposals Sent</div><div class="m-sc-desc">Volume and conversion</div></div>
+              </div>
+              <div class="m-sc-body"><span class="m-sc-body-text">Chart data</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── AFTER: NEW 2-COLUMN GRID LAYOUT ─── -->
+  <div class="phone-wrap" id="wrapAfter">
+    <div class="phone-label new-label">Proposed — Clean 2-Col Grid ✦</div>
+    <div class="phone">
+      <div class="phone-screen" id="newPhoneScreen">
+        <!-- Drawer backdrop -->
+        <div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+        <!-- Drawer -->
+        <div class="kpi-drawer" id="kpiDrawer">
+          <div class="drawer-handle"></div>
+          <div class="drawer-head">
+            <div class="drawer-head-left">
+              <div class="drawer-icon" id="drawerIcon"></div>
+              <div>
+                <div class="drawer-title" id="drawerTitle"></div>
+                <div class="drawer-subtitle" id="drawerSubtitle"></div>
+              </div>
+            </div>
+          </div>
+          <div class="drawer-body" id="drawerBody"></div>
+        </div>
+        <!-- Nav -->
+        <div class="m-nav">
+          <span class="m-nav-logo">dripjobs</span>
+          <div class="m-nav-avatar">JH</div>
+        </div>
+        <!-- Date bar -->
+        <div class="m-datebar">
+          <div class="m-date-pill">📅 03/04/2026 – 04/03/2026</div>
+          <div class="m-period-tabs" id="newPeriodTabs">
+            <div class="m-period-tab" onclick="setTab(this)">Today</div>
+            <div class="m-period-tab" onclick="setTab(this)">Week</div>
+            <div class="m-period-tab" onclick="setTab(this)">Last Wk</div>
+            <div class="m-period-tab active" onclick="setTab(this)">Month</div>
+            <div class="m-period-tab" onclick="setTab(this)">Last Mo</div>
+            <div class="m-period-tab" onclick="setTab(this)">YTD</div>
+            <div class="m-period-tab" onclick="setTab(this)">All</div>
+          </div>
+        </div>
+        <!-- Main -->
+        <div class="m-main">
+          <div class="m-overview-label">Overview</div>
+          <!-- NEW 2-column grid — NO group labels, NO affordance text, icon + label + value only -->
+          <div class="new-banner">
+            <div class="kpi-grid">
+              <!-- 1. Sales -->
+              <div class="kpi-card" onclick="openDrawer('sales')">
+                <div class="kpi-card-icon icon-sales">💰</div>
+                <div class="kpi-card-label">Sales</div>
+                <div class="kpi-card-value sm">$142,977</div>
+              </div>
+              <!-- 2. Closing Ratio -->
+              <div class="kpi-card" onclick="openDrawer('closing')">
+                <div class="kpi-card-icon icon-closing">%</div>
+                <div class="kpi-card-label">Closing Ratio</div>
+                <div class="kpi-card-value">23.2%</div>
+              </div>
+              <!-- 3. Proposals Sent -->
+              <div class="kpi-card" onclick="openDrawer('proposals')">
+                <div class="kpi-card-icon icon-proposals">📄</div>
+                <div class="kpi-card-label">Proposals Sent</div>
+                <div class="kpi-card-value">42</div>
+              </div>
+              <!-- 4. Avg Job Size -->
+              <div class="kpi-card" onclick="openDrawer('avg')">
+                <div class="kpi-card-icon icon-avg">📊</div>
+                <div class="kpi-card-label">Avg Job Size</div>
+                <div class="kpi-card-value sm">$5,719</div>
+              </div>
+              <!-- 5. Appointments Booked -->
+              <div class="kpi-card" onclick="openDrawer('appts')">
+                <div class="kpi-card-icon icon-appts">📅</div>
+                <div class="kpi-card-label">Appts Booked</div>
+                <div class="kpi-card-value">78</div>
+              </div>
+              <!-- 6. Set Rate -->
+              <div class="kpi-card" onclick="openDrawer('setrate')">
+                <div class="kpi-card-icon icon-setrate">🎯</div>
+                <div class="kpi-card-label">Set Rate</div>
+                <div class="kpi-card-value">36.17%</div>
+              </div>
+              <!-- 7. Total Jobs Won — full width, last row -->
+              <div class="kpi-card full-width" onclick="openDrawer('jobs')">
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div class="kpi-card-icon icon-jobs">🏆</div>
+                  <div>
+                    <div class="kpi-card-label">Total Jobs Won</div>
+                    <div class="kpi-card-value" style="margin-top:4px">25</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Section cards below — unchanged mobile behavior (stacked single col) -->
+          <div class="m-sections">
+            <div class="m-sc">
+              <div class="m-sc-head">
+                <div class="m-sc-icon">💰</div>
+                <div><div class="m-sc-title">Revenue by Lead Source</div><div class="m-sc-desc">Pipeline revenue breakdown</div></div>
+              </div>
+              <div class="m-sc-body"><span class="m-sc-body-text">Chart data</span></div>
+            </div>
+            <div class="m-sc">
+              <div class="m-sc-head">
+                <div class="m-sc-icon" style="background:#FFF1F3">📋</div>
+                <div><div class="m-sc-title">Proposals Sent</div><div class="m-sc-desc">Volume and conversion</div></div>
+              </div>
+              <div class="m-sc-body"><span class="m-sc-body-text">Chart data</span></div>
+            </div>
+            <div class="m-sc">
+              <div class="m-sc-head">
+                <div class="m-sc-icon" style="background:#FFFAEB">📍</div>
+                <div><div class="m-sc-title">Jobs by Lead Source</div><div class="m-sc-desc">Jobs won breakdown</div></div>
+              </div>
+              <div class="m-sc-body"><span class="m-sc-body-text">Chart data</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Annotations -->
+    <div class="annot-row">
+      <div class="annot-chip">
+        <div class="annot-num">1</div>
+        <div class="annot-text"><strong>No group labels.</strong> "Revenue &amp; Wins" / "Conversions &amp; Volume" headers hidden at mobile widths.</div>
+      </div>
+      <div class="annot-chip">
+        <div class="annot-num">2</div>
+        <div class="annot-text"><strong>Card face: icon + label + value only.</strong> "View details →" and definition text removed from card face. Tap still opens drawer.</div>
+      </div>
+      <div class="annot-chip">
+        <div class="annot-num">3</div>
+        <div class="annot-text"><strong>7th card full-width.</strong> Total Jobs Won spans both columns — cleaner than an orphaned half-row.</div>
+      </div>
+      <div class="annot-chip">
+        <div class="annot-num">4</div>
+        <div class="annot-text"><strong>Desktop layout unchanged.</strong> Groups, 3-col grid, and "View details →" affordance preserved at &gt;768px.</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /phones-row -->
+
+<p class="compare-note">
+  Toggle "Before / After / Side by Side" above. Tap any KPI card in the <em>After</em> phone to preview the preserved drawer interaction.<br>
+  Desktop layout is not shown here — it is unchanged from ticket 86b8qu3hn.
+</p>
+
+<script>
+// ─── DRAWER DATA ─────────────────────────────────────────────────
+var METRICS = {
+  sales: {
+    icon: '💰', bg: '#ECFDF3', title: 'Sales', value: '$142,977',
+    subtitle: 'Pipeline + Manual Invoice Revenue',
+    breakdown: [
+      { label: 'Pipeline Deals', val: '$98,420', dot: '#039855' },
+      { label: 'Manual Invoices', val: '$44,557', dot: '#6941C6' },
+    ]
+  },
+  closing: {
+    icon: '%', bg: '#EFF8FF', iconColor: '#1570EF', title: 'Closing Ratio', value: '23.2%',
+    subtitle: 'Accepted Proposals ÷ Qualified Proposals',
+    breakdown: [
+      { label: 'Proposals Sent', val: '42', dot: '#1570EF' },
+      { label: 'Proposals Accepted', val: '10', dot: '#039855' },
+      { label: 'Pending', val: '32', dot: '#98A2B3' },
+    ]
+  },
+  proposals: {
+    icon: '📄', bg: '#EFF8FF', title: 'Proposals Sent', value: '42',
+    subtitle: 'Total proposals sent in period',
+    breakdown: [
+      { label: 'Accepted', val: '10', dot: '#039855' },
+      { label: 'Pending', val: '24', dot: '#F79009' },
+      { label: 'Declined', val: '8', dot: '#B42318' },
+    ]
+  },
+  avg: {
+    icon: '📊', bg: '#F4F3FF', title: 'Avg Job Size', value: '$5,719',
+    subtitle: 'Total Sales ÷ Jobs Won',
+    breakdown: [
+      { label: 'Highest job', val: '$18,400', dot: '#039855' },
+      { label: 'Lowest job', val: '$750', dot: '#B42318' },
+      { label: 'Median job', val: '$4,200', dot: '#6941C6' },
+    ]
+  },
+  appts: {
+    icon: '📅', bg: '#FFF1F3', title: 'Appointments Booked', value: '78',
+    subtitle: 'Total booked in period, by customer type',
+    breakdown: [
+      { label: 'New Customers', val: '52', dot: '#6941C6' },
+      { label: 'Returning', val: '26', dot: '#039855' },
+    ]
+  },
+  setrate: {
+    icon: '🎯', bg: '#F0FDF9', title: 'Set Rate', value: '36.17%',
+    subtitle: 'Contacts Created → Booked Appointment',
+    breakdown: [
+      { label: 'Contacts Created', val: '216', dot: '#475467' },
+      { label: 'Appointments Set', val: '78', dot: '#039855' },
+    ]
+  },
+  jobs: {
+    icon: '🏆', bg: '#FFFAEB', title: 'Total Jobs Won', value: '25',
+    subtitle: 'Accepted Proposals + Manual Invoices',
+    breakdown: [
+      { label: 'Via Proposals', val: '18', dot: '#6941C6' },
+      { label: 'Manual Invoices', val: '7', dot: '#039855' },
+    ]
+  }
+};
+
+function openDrawer(key) {
+  var m = METRICS[key];
+  if (!m) return;
+
+  // Icon
+  var iconEl = document.getElementById('drawerIcon');
+  iconEl.textContent = m.icon;
+  iconEl.style.background = m.bg;
+  if (m.iconColor) { iconEl.style.color = m.iconColor; iconEl.style.fontWeight = '800'; iconEl.style.fontSize = '13px'; iconEl.style.fontFamily = "'DM Sans', sans-serif"; }
+  else { iconEl.style.color = ''; iconEl.style.fontWeight = ''; iconEl.style.fontSize = ''; }
+
+  document.getElementById('drawerTitle').textContent = m.title;
+  document.getElementById('drawerSubtitle').textContent = m.subtitle;
+
+  // Body
+  var bd = m.breakdown.map(function(r) {
+    return '<div class="drawer-bd-row"><div class="drawer-bd-left"><div class="drawer-bd-dot" style="background:' + r.dot + '"></div><div class="drawer-bd-name">' + r.label + '</div></div><div class="drawer-bd-val">' + r.val + '</div></div>';
+  }).join('');
+
+  document.getElementById('drawerBody').innerHTML =
+    '<div class="drawer-value-row"><div class="drawer-big-value">' + m.value + '</div><div class="drawer-period-badge">This Month</div></div>' +
+    '<div class="drawer-bd-label">Breakdown</div>' +
+    bd +
+    '<button class="drawer-close-btn" onclick="closeDrawer()">Close</button>';
+
+  document.getElementById('drawerBackdrop').classList.add('show');
+  document.getElementById('kpiDrawer').classList.add('show');
+}
+
+function closeDrawer() {
+  document.getElementById('drawerBackdrop').classList.remove('show');
+  document.getElementById('kpiDrawer').classList.remove('show');
+}
+
+function setTab(el) {
+  document.querySelectorAll('#newPeriodTabs .m-period-tab').forEach(function(t) { t.classList.remove('active'); });
+  el.classList.add('active');
+}
+
+// ─── VIEW TOGGLE ─────────────────────────────────────────────────
+function showView(mode) {
+  var before = document.getElementById('wrapBefore');
+  var after  = document.getElementById('wrapAfter');
+  document.getElementById('btnBefore').classList.toggle('active', mode === 'before');
+  document.getElementById('btnAfter').classList.toggle('active',  mode === 'after');
+  document.getElementById('btnBoth').classList.toggle('active',   mode === 'both');
+  if (mode === 'before') {
+    before.style.display = 'flex';
+    after.style.display  = 'none';
+  } else if (mode === 'after') {
+    before.style.display = 'none';
+    after.style.display  = 'flex';
+  } else {
+    before.style.display = 'flex';
+    after.style.display  = 'flex';
+  }
+}
+</script>
+</body>
+</html>

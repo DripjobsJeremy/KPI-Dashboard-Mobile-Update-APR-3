@@ -353,22 +353,37 @@ body {
    2-column clean card grid
 ════════════════════════════════════════ */
 .new-banner { display: flex; flex-direction: column; gap: 0; }
-.kpi-grid {
+/* Two side-by-side group columns */
+.kpi-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin-bottom: 0;
+  align-items: start;
+}
+.kpi-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.kpi-column-title {
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 0 2px;
+  margin-bottom: 2px;
 }
 .kpi-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 14px 12px;
+  border-radius: 12px;
+  padding: 10px 9px;
   box-shadow: var(--shadow-tile);
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 12px;
+  gap: 9px;
   cursor: pointer;
   transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
   -webkit-tap-highlight-color: transparent;
@@ -381,10 +396,10 @@ body {
   box-shadow: 0 0 0 2px var(--purple-ring);
 }
 .kpi-card-icon {
-  width: 44px; height: 44px;
-  border-radius: 12px;
+  width: 38px; height: 38px;
+  border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 22px;
+  font-size: 19px;
   flex-shrink: 0;
 }
 .icon-sales     { background: #DCFCE7; }
@@ -964,63 +979,57 @@ body {
         <!-- Main -->
         <div class="m-main">
           <div class="m-overview-label">Overview</div>
-          <!-- NEW 2-column grid — NO group labels, NO affordance text, icon + label + value only -->
+          <!-- 2-column grouped KPI layout -->
           <div class="new-banner">
-            <div class="kpi-grid">
-              <!-- 1. Sales -->
-              <div class="kpi-card" onclick="openDrawer('sales')">
-                <div class="kpi-card-icon icon-sales">💵</div>
-                <div class="kpi-card-content">
-                  <div class="kpi-card-label">Sales</div>
-                  <div class="kpi-card-value">$142,977</div>
+            <div class="kpi-columns">
+              <!-- ── REVENUE & WINS ── -->
+              <div class="kpi-column">
+                <div class="kpi-column-title">Revenue &amp; Wins</div>
+                <div class="kpi-card" onclick="openDrawer('sales')">
+                  <div class="kpi-card-icon icon-sales">💵</div>
+                  <div class="kpi-card-content">
+                    <div class="kpi-card-label">Sales</div>
+                    <div class="kpi-card-value">$142,977</div>
+                  </div>
+                </div>
+                <div class="kpi-card" onclick="openDrawer('jobs')">
+                  <div class="kpi-card-icon icon-jobs">🏆</div>
+                  <div class="kpi-card-content">
+                    <div class="kpi-card-label">Jobs Won</div>
+                    <div class="kpi-card-value">25</div>
+                  </div>
+                </div>
+                <div class="kpi-card" onclick="openDrawer('avg')">
+                  <div class="kpi-card-icon icon-avg">📈</div>
+                  <div class="kpi-card-content">
+                    <div class="kpi-card-label">Avg Job Size</div>
+                    <div class="kpi-card-value">$5,719</div>
+                  </div>
                 </div>
               </div>
-              <!-- 2. Closing Ratio -->
-              <div class="kpi-card" onclick="openDrawer('closing')">
-                <div class="kpi-card-icon icon-closing">%</div>
-                <div class="kpi-card-content">
-                  <div class="kpi-card-label">Closing Ratio</div>
-                  <div class="kpi-card-value">23.2%</div>
+              <!-- ── CONVERSIONS & VOLUME ── -->
+              <div class="kpi-column">
+                <div class="kpi-column-title">Conversions &amp; Volume</div>
+                <div class="kpi-card" onclick="openDrawer('closing')">
+                  <div class="kpi-card-icon icon-closing">%</div>
+                  <div class="kpi-card-content">
+                    <div class="kpi-card-label">Closing Ratio</div>
+                    <div class="kpi-card-value">23.2%</div>
+                  </div>
                 </div>
-              </div>
-              <!-- 3. Proposals Sent -->
-              <div class="kpi-card" onclick="openDrawer('proposals')">
-                <div class="kpi-card-icon icon-proposals">📋</div>
-                <div class="kpi-card-content">
-                  <div class="kpi-card-label">Proposals Sent</div>
-                  <div class="kpi-card-value">42</div>
+                <div class="kpi-card" onclick="openDrawer('setrate')">
+                  <div class="kpi-card-icon icon-setrate">🎯</div>
+                  <div class="kpi-card-content">
+                    <div class="kpi-card-label">Set Rate</div>
+                    <div class="kpi-card-value">36.17%</div>
+                  </div>
                 </div>
-              </div>
-              <!-- 4. Avg Job Size -->
-              <div class="kpi-card" onclick="openDrawer('avg')">
-                <div class="kpi-card-icon icon-avg">📈</div>
-                <div class="kpi-card-content">
-                  <div class="kpi-card-label">Avg Job Size</div>
-                  <div class="kpi-card-value">$5,719</div>
-                </div>
-              </div>
-              <!-- 5. Appointments Booked -->
-              <div class="kpi-card" onclick="openDrawer('appts')">
-                <div class="kpi-card-icon icon-appts">📆</div>
-                <div class="kpi-card-content">
-                  <div class="kpi-card-label">Appointments Booked</div>
-                  <div class="kpi-card-value">78</div>
-                </div>
-              </div>
-              <!-- 6. Set Rate -->
-              <div class="kpi-card" onclick="openDrawer('setrate')">
-                <div class="kpi-card-icon icon-setrate">🎯</div>
-                <div class="kpi-card-content">
-                  <div class="kpi-card-label">Set Rate</div>
-                  <div class="kpi-card-value">36.17%</div>
-                </div>
-              </div>
-              <!-- 7. Total Jobs Won -->
-              <div class="kpi-card" onclick="openDrawer('jobs')">
-                <div class="kpi-card-icon icon-jobs">🏆</div>
-                <div class="kpi-card-content">
-                  <div class="kpi-card-label">Total Jobs Won</div>
-                  <div class="kpi-card-value">25</div>
+                <div class="kpi-card" onclick="openDrawer('appts')">
+                  <div class="kpi-card-icon icon-appts">📆</div>
+                  <div class="kpi-card-content">
+                    <div class="kpi-card-label">Appointments</div>
+                    <div class="kpi-card-value">78</div>
+                  </div>
                 </div>
               </div>
             </div>

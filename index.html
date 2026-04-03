@@ -139,23 +139,28 @@ body {
   width: 100%;
   border-radius: 34px;
   background: var(--bg);
-  overflow: hidden;
+  overflow: hidden; /* clips border-radius + hides off-screen drawer */
   position: relative;
-  /* fixed height = scrollable phone screen */
   height: 720px;
+  /* NO overflow-y here — inner .phone-inner scrolls instead */
+}
+/* Inner scroll layer keeps drawer/backdrop anchored to the 720px viewport */
+.phone-inner {
+  height: 100%;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
 }
-.phone-screen::-webkit-scrollbar { display: none; }
-/* Status bar */
-.phone-screen::before {
-  content: '9:41';
+.phone-inner::-webkit-scrollbar { display: none; }
+/* Status bar — real element so it's sticky within the inner scroll context */
+.phone-statusbar {
+  height: 40px;
+  background: var(--surface);
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 40px;
-  background: var(--surface);
   font-size: 12px;
   font-weight: 700;
   color: var(--text-primary);
@@ -164,6 +169,7 @@ body {
   top: 0;
   z-index: 60;
   letter-spacing: 0.04em;
+  flex-shrink: 0;
 }
 
 /* ─── APP NAV (mobile) ───────────────────────────── */
@@ -655,6 +661,13 @@ body {
 .annot-text strong { color: rgba(255,255,255,0.85); font-weight: 600; }
 .annot-code { font-size: 10px; background: rgba(255,255,255,0.1); padding: 1px 4px; border-radius: 3px; }
 
+/* ─── INSIGHTS CARD ──────────────────────────────── */
+.m-sc-insights { border-top: 3px solid var(--purple); }
+.m-sc-icon-insights { background: #F4F3FF; }
+.m-sc-title-insights { color: var(--purple); text-transform: uppercase; font-size: 11px; letter-spacing: 0.08em; }
+.insights-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 9px; margin-top: 4px; }
+.insights-item { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
 /* ─── COMPARISON NOTE ────────────────────────────── */
 .compare-note {
   text-align: center;
@@ -690,6 +703,8 @@ body {
     <div class="phone-label">Current — Grouped, Cluttered</div>
     <div class="phone">
       <div class="phone-screen">
+        <div class="phone-inner">
+        <div class="phone-statusbar">9:41</div>
         <!-- Nav -->
         <div class="m-nav">
           <span class="m-nav-logo">dripjobs</span>
@@ -900,6 +915,7 @@ body {
             </div>
           </div>
         </div>
+        </div><!-- /phone-inner -->
       </div>
     </div>
   </div>
@@ -925,6 +941,9 @@ body {
           </div>
           <div class="drawer-body" id="drawerBody"></div>
         </div>
+        <!-- Scrollable inner layer — drawer stays outside, anchored to 720px viewport -->
+        <div class="phone-inner">
+        <div class="phone-statusbar">9:41</div>
         <!-- Nav -->
         <div class="m-nav">
           <span class="m-nav-logo">dripjobs</span>
@@ -1000,6 +1019,7 @@ body {
           <!-- Section cards — JS-rendered, all 12 cards from production screenshots -->
           <div class="m-sections" id="afterSections"></div>
         </div>
+        </div><!-- /phone-inner -->
       </div>
     </div>
     <!-- Annotations -->
@@ -1227,14 +1247,14 @@ function buildSectionCard(s) {
 }
 
 function buildInsightsCard() {
-  return '<div class="m-sc" style="border-top:3px solid #6941C6">' +
-    '<div class="m-sc-head"><div class="m-sc-icon" style="background:#F4F3FF">💡</div>' +
-    '<div><div class="m-sc-title" style="color:#6941C6;text-transform:uppercase;font-size:11px;letter-spacing:0.08em">Key Insights</div></div></div>' +
-    '<ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:9px;margin-top:4px">' +
-    '<li style="font-size:12px;color:#475467">Your top sales source is <strong>Google Ads</strong> with <strong>$85,786</strong> in revenue out of $142,977 total sales.</li>' +
-    '<li style="font-size:12px;color:#475467"><strong>Google Ads</strong> generated the most leads with <strong>78</strong> new contacts (36%).</li>' +
-    '<li style="font-size:12px;color:#475467">Closing ratio is <strong>23.2%</strong> and set rate is <strong>36.17%</strong> for the selected period.</li>' +
-    '<li style="font-size:12px;color:#475467"><strong>$71,489</strong> in revenue has no product category assigned.</li>' +
+  return '<div class="m-sc m-sc-insights">' +
+    '<div class="m-sc-head"><div class="m-sc-icon m-sc-icon-insights">💡</div>' +
+    '<div><div class="m-sc-title m-sc-title-insights">Key Insights</div></div></div>' +
+    '<ul class="insights-list">' +
+    '<li class="insights-item">Your top sales source is <strong>Google Ads</strong> with <strong>$85,786</strong> in revenue out of $142,977 total sales.</li>' +
+    '<li class="insights-item"><strong>Google Ads</strong> generated the most leads with <strong>78</strong> new contacts (36%).</li>' +
+    '<li class="insights-item">Closing ratio is <strong>23.2%</strong> and set rate is <strong>36.17%</strong> for the selected period.</li>' +
+    '<li class="insights-item"><strong>$71,489</strong> in revenue has no product category assigned.</li>' +
     '</ul></div>';
 }
 
